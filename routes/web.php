@@ -10,6 +10,7 @@ use App\Livewire\Auth\Register;
 use App\Livewire\Auth\Verify;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\TaxonUm;
+use App\Livewire\TaxonEr;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,7 +25,7 @@ use App\Livewire\TaxonUm;
 
 Route::view('/', 'welcome')->name('home');
 
-//Route::get('/taxonomy', TaxonUm::class)->name('taxon.um');
+Route::get('/taxonomy', TaxonUm::class)->name('taxon.um');
 
 Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)
