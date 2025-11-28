@@ -24,7 +24,7 @@ use App\Livewire\TaxonUm;
 
 Route::view('/', 'welcome')->name('home');
 
-Route::get('/taxonomy', TaxonUm::class)->name('taxon.um');
+//Route::get('/taxonomy', TaxonUm::class)->name('taxon.um');
 
 Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)
