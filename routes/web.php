@@ -27,6 +27,8 @@ Route::view('/', 'welcome')->name('home');
 
 Route::get('/taxonomy', TaxonEr::class)->name('taxon-er');
 
+Route::get('/dashboard', 'Dashboard');
+
 Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)
         ->name('login');
