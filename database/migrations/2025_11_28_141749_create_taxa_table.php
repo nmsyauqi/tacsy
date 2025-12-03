@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('taxa', function (Blueprint $table) {
             $table->id();
+            $table->string('name'); // Kolom Nama
+            $table->string('rank'); // Kolom Rank (Kingdom, Genus, dll)
+            $table->foreignId('parent_id')->nullable()->constrained('taxa')->onDelete('cascade'); // Relasi ke dirinya sendiri (Induk)
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relasi ke User pembuat
             $table->timestamps();
         });
     }

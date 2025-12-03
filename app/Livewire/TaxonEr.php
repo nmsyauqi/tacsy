@@ -4,36 +4,38 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Taxon;
+use Illuminate\Support\Facades\Auth;
 
 class TaxonEr extends Component
 {
     public $name;
     public $rank;
-    
+
+    protected $rules = [
+        'name' => 'required|min:3|string',
+        'rank' => 'required|string',
+    ];
+
     public function save()
     {
-        // 1. Validasi & Simpan
-        $this->validate([
-            'name' => 'required|min:3',
-            'rank' => 'required',
-        ]);
+        $this->validate();
 
         Taxon::create([
             'name' => $this->name,
             'rank' => $this->rank,
-            'user_id' => auth()->id(), // Simpan siapa pembuatnya
+            'user_id' => Auth::id(), 
+            'parent_id' => null, 
         ]);
 
-        // 2. Reset Form
         $this->reset(['name', 'rank']);
 
-        // 3. KUNCI RAHASIA: Kirim sinyal ke TaxonUm agar refresh
         $this->dispatch('taxon-updated'); 
+        
+        session()->flash('status', 'Taxonomy berhasil ditambahkan!');
     }
 
     public function render()
     {
-        // Menggunakan layout dashboard (sidebar, navbar, dll)
-        return view('livewire.taxon-er')->layout('layouts.app');
+        return view('livewire.taxon-er');
     }
 }

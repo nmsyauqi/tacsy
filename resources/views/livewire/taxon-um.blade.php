@@ -1,7 +1,3 @@
-@extends('layouts.base')
-
-@section('body')
-
 <div class="p-6 max-w-6xl mx-auto font-pixel text-gray-800">
 
     <div class="text-center mb-10">
@@ -46,5 +42,3 @@
     </div>
 
 </div>
-
-@endsection

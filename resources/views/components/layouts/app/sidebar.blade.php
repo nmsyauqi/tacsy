@@ -16,7 +16,7 @@
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Pustaka Taksonomi')" class="grid">
                     
-                    <flux:navlist.item icon="layout-grid" :href="route('taxonomy.list')" :current="request()->routeIs('taxonomy.list')" wire:navigate>{{ __('Semua Kategori') }}</flux:navlist.item>
+                    <flux:navlist.item icon="layout-grid" :href="route('taxon-um')" :current="request()->routeIs('taxonomy.list')" wire:navigate>{{ __('Semua Kategori') }}</flux:navlist.item>
 
                     @auth
                         <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard (CRUD)') }}</flux:navlist.item>

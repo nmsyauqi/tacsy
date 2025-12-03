@@ -11,21 +11,29 @@ use App\Livewire\Auth\Verify;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\TaxonUm;
 use App\Livewire\TaxonEr;
+use App\Livewire\Settings\Profile;
+use App\Livewire\Settings\Password;
+use App\Livewire\Settings\Appearance;
+use App\Livewire\Settings\TwoFactor;
 
 
 Route::view('/', 'welcome')->name('home');
+Route::get('/taxon-um', TaxonUm::class)->name('taxon-um');
 
 Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)->name('login');
     Route::get('register', Register::class)->name('register');
-    Route::get('/taxon-um', TaxonUm::class)->name('taxon-um');
+    
 
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
     
     Route::get('/dashboard', TaxonEr::class)->name('dashboard');
-
+    Route::get('/settings/profile', Profile::class)->name('profile.edit');
+    Route::get('/settings/password', Password::class)->name('user-password.edit');
+    Route::get('/settings/appearance', Appearance::class)->name('appearance.edit');
+    Route::get('/settings/two-factor', TwoFactor::class)->name('two-factor.show');
 });
 
 
