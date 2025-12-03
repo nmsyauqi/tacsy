@@ -11,15 +11,16 @@ class TaxonUm extends Component
     #[On('taxon-updated')] 
     public function refreshList() {}
 
-    // FUNGSI BARU: Memicu edit
     public function triggerEdit($id)
     {
-        // Kirim sinyal ke TaxonEr (Parent Component)
-        $this->dispatch('edit-taxon', id: $id); 
+        // UBAH JADI REDIRECT:
+        // Mengarahkan ke route 'dashboard' dengan parameter query '?edit=ID'
+        return redirect()->route('dashboard', ['edit' => $id]);
     }
 
     public function render()
     {
+        // ... (kode query render tetap sama) ...
         $groupedTaxons = Taxon::with('parent', 'user')
             ->orderBy('name')
             ->get()

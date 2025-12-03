@@ -25,9 +25,6 @@
                                 @can('update', $item)
                                     <button 
                                         wire:click="triggerEdit({{ $item->id }})" 
-                                        {{-- TAMBAHAN: Perintah Scroll --}}
-                                        onclick="document.getElementById('form-editor').scrollIntoView({ behavior: 'smooth', block: 'center' })"
-                                        
                                         class="absolute top-2 right-2 p-2 bg-yellow-400 text-black border-2 border-black hover:bg-yellow-300 shadow-sm z-20"
                                         title="Edit Data">
                                         ✏️

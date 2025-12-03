@@ -4,20 +4,33 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\Attributes\On; 
+use Livewire\Attributes\Url; // <-- TAMBAHKAN IMPORT INI
 use App\Models\Taxon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule; // <-- Pastikan import ini ada
+use Illuminate\Validation\Rule;
 
 class TaxonEr extends Component
 {
+    // MENANGKAP URL:
+    // Jika urlnya /dashboard?edit=5, maka variabel ini akan berisi 5
+    #[Url(as: 'edit')] 
+    public $urlEditId = ''; 
+
     public $name;
     public $rank;
     public $parent_id;
-    
     public $editingTaxonId = null; 
 
-    // Urutan: 0 (Tertinggi) -> 6 (Terendah)
     public $ranks = ['Kingdom', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species'];
+
+    // FUNGSI MOUNT: Dijalankan saat halaman pertama kali dimuat
+    public function mount()
+    {
+        // Jika ada ID di URL, langsung masuk mode edit
+        if ($this->urlEditId) {
+            $this->edit($this->urlEditId);
+        }
+    }
 
     #[On('edit-taxon')]
     public function edit($id)
@@ -32,40 +45,32 @@ class TaxonEr extends Component
         }
     }
 
+    // ... (Sisa fungsi cancelEdit, save, render BIARKAN SAMA seperti sebelumnya) ...
     public function cancelEdit()
     {
-        $this->reset(['name', 'rank', 'parent_id', 'editingTaxonId']);
+        $this->reset(['name', 'rank', 'parent_id', 'editingTaxonId', 'urlEditId']);
+        // Hapus juga parameter di URL agar bersih
+        $this->js("window.history.replaceState(null, '', window.location.pathname)");
     }
 
     public function save()
     {
+        // ... (Copy paste isi fungsi save yang terakhir kamu punya) ...
         $this->validate([
-            // 1. Validasi Nama Unik
             'name' => [
-                'required', 
-                'min:3', 
-                'string',
+                'required', 'min:3', 'string',
                 Rule::unique('taxa', 'name')->ignore($this->editingTaxonId)
             ],
-            
             'rank' => 'required|string|in:' . implode(',', $this->ranks),
-            
-            // 2. Validasi Hierarki
             'parent_id' => [
-                'nullable',
-                'exists:taxa,id',
+                'nullable', 'exists:taxa,id',
                 function ($attribute, $value, $fail) {
                     if ($value) {
                         $parent = Taxon::find($value);
-                        
                         $parentIdx = array_search($parent->rank, $this->ranks);
                         $currentIdx = array_search($this->rank, $this->ranks);
-
-                        // Parent harus punya index lebih kecil (rank lebih tinggi)
-                        if ($parentIdx !== false && $currentIdx !== false) {
-                            if ($parentIdx >= $currentIdx) {
-                                $fail("Hierarki Salah: Induk ({$parent->rank}) tidak boleh lebih tinggi atau sama dengan data ini ({$this->rank}).");
-                            }
+                        if ($parentIdx !== false && $currentIdx !== false && $parentIdx >= $currentIdx) {
+                            $fail("Hierarki Salah: Induk ({$parent->rank}) tidak boleh lebih rendah/sama dengan data ini ({$this->rank}).");
                         }
                     }
                 },
@@ -100,7 +105,6 @@ class TaxonEr extends Component
     public function render()
     {
         $query = Taxon::where('rank', '!=', 'Species')->orderBy('name');
-        
         if ($this->editingTaxonId) {
             $query->where('id', '!=', $this->editingTaxonId);
         }
