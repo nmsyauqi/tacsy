@@ -1,9 +1,8 @@
 <div class="flex flex-col gap-8 max-w-7xl mx-auto">
     
-    <div class="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-sm relative overflow-hidden">
+    <div id="form-editor" class="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-sm relative overflow-hidden transition-all duration-500">
         
-        <h2 class="text-xl font-bold mb-6 text-zinc-800 dark:text-zinc-100 flex items-center gap-2">
-            <span>{{ $editingTaxonId ? '✏️' : '🧬' }}</span> 
+        <h2 class="text-xl font-bold mb-6 text-zinc-800 dark:text-zinc-100 flex items-center gap-2">            <span>{{ $editingTaxonId ? '✏️' : '🧬' }}</span> 
             {{ $editingTaxonId ? 'Edit Data Organisme' : 'Tambah Data Organisme' }}
         </h2>
 
