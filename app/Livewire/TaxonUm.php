@@ -8,25 +8,28 @@ use App\Models\Taxon;
 
 class TaxonUm extends Component
 {
-
-    public $search = '';
-
     #[On('taxon-updated')] 
-    public function refreshList()
+    public function refreshList() {}
+
+    // FUNGSI BARU: Memicu edit
+    public function triggerEdit($id)
     {
-        // 
+        // Kirim sinyal ke TaxonEr (Parent Component)
+        $this->dispatch('edit-taxon', id: $id); 
     }
 
     public function render()
     {
-        $taxons = Taxon::query()
-            ->when($this->search, fn($q) => $q->where('name', 'like', '%'.$this->search.'%'))
-            ->with('parent')
-            ->orderBy('rank')
-            ->get();
+        $groupedTaxons = Taxon::with('parent', 'user')
+            ->orderBy('name')
+            ->get()
+            ->groupBy('rank');
+
+        $rankOrder = ['Kingdom', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species'];
 
         return view('livewire.taxon-um', [
-            'taxons' => $taxons
+            'groupedTaxons' => $groupedTaxons,
+            'rankOrder' => $rankOrder
         ])->layout('layouts.base');
     }
 }

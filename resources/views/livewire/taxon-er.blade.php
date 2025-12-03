@@ -1,52 +1,75 @@
-<div class="flex flex-col gap-6">
+<div class="flex flex-col gap-8 max-w-7xl mx-auto">
     
-    <div class="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-sm">
-        <h2 class="text-lg font-semibold mb-4 text-zinc-800 dark:text-zinc-100">Tambah Taxonomy Baru</h2>
+    <div class="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-sm relative overflow-hidden">
+        
+        <h2 class="text-xl font-bold mb-6 text-zinc-800 dark:text-zinc-100 flex items-center gap-2">
+            <span>{{ $editingTaxonId ? '✏️' : '🧬' }}</span> 
+            {{ $editingTaxonId ? 'Edit Data Organisme' : 'Tambah Data Organisme' }}
+        </h2>
 
         @if (session('status'))
-            <div class="mb-4 p-2 bg-green-100 text-green-700 rounded text-sm">
+            <div class="mb-6 p-4 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg border border-green-200 dark:border-green-800 flex items-center gap-2">
                 {{ session('status') }}
             </div>
         @endif
 
-        <form wire:submit="save" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Nama Latin / Umum</label>
+        <form wire:submit="save" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+                <label class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300">Nama Latin / Umum</label>
                 <input type="text" wire:model="name" 
-                       class="w-full rounded-md border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                       placeholder="Contoh: Felis catus">
-                @error('name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                       class="w-full rounded-lg border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm"
+                       placeholder="Contoh: Panthera tigris">
+                @error('name') <span class="text-red-500 text-xs font-medium">{{ $message }}</span> @enderror
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Peringkat (Rank)</label>
+            <div class="space-y-2">
+                <label class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300">Peringkat (Rank)</label>
                 <select wire:model="rank" 
-                        class="w-full rounded-md border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                    <option value="">-- Pilih Rank --</option>
-                    <option value="Kingdom">Kingdom</option>
-                    <option value="Phylum">Phylum</option>
-                    <option value="Class">Class</option>
-                    <option value="Order">Order</option>
-                    <option value="Family">Family</option>
-                    <option value="Genus">Genus</option>
-                    <option value="Species">Species</option>
+                        class="w-full rounded-lg border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm">
+                    <option value="">-- Pilih Tingkatan --</option>
+                    @foreach($ranks as $r)
+                        <option value="{{ $r }}">{{ $r }}</option>
+                    @endforeach
                 </select>
-                @error('rank') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                @error('rank') <span class="text-red-500 text-xs font-medium">{{ $message }}</span> @enderror
             </div>
 
-            <div class="flex justify-end">
+            <div class="md:col-span-2 space-y-2">
+                <label class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300">Induk (Parent)</label>
+                <select wire:model="parent_id" 
+                        class="w-full rounded-lg border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm">
+                    <option value="">-- Tidak Ada Induk (Root/Kingdom) --</option>
+                    @foreach($parents as $p)
+                        <option value="{{ $p->id }}">{{ $p->name }} ({{ $p->rank }})</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="md:col-span-2 flex justify-end gap-3 pt-2">
+                
+                @if($editingTaxonId)
+                    <button type="button" wire:click="cancelEdit"
+                            class="px-4 py-2 border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+                        Batal
+                    </button>
+                @endif
+
                 <button type="submit" 
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium transition">
-                    Simpan Data
+                        class="px-6 py-2.5 {{ $editingTaxonId ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-zinc-900 dark:bg-white hover:opacity-90' }} text-white dark:text-black rounded-lg font-medium shadow-lg transition-all transform hover:-translate-y-0.5">
+                    {{ $editingTaxonId ? 'Update Perubahan' : '+ Simpan ke Database' }}
                 </button>
             </div>
         </form>
     </div>
 
-    <div class="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-sm">
-        <h2 class="text-lg font-semibold mb-4 text-zinc-800 dark:text-zinc-100">Database Taxonomy</h2>
+    <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden bg-gray-50 dark:bg-zinc-900/50">
+        <div class="p-4 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex justify-between items-center">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-500">Preview Database</h2>
+            <span class="text-xs bg-zinc-200 dark:bg-zinc-700 px-2 py-1 rounded text-zinc-600 dark:text-zinc-300">Mode: Retro View</span>
+        </div>
         
-        <livewire:taxon-um />
-
+        <div class="p-6 overflow-x-auto">
+            <livewire:taxon-um />
+        </div>
     </div>
 </div>
