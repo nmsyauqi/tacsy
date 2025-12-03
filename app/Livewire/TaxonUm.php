@@ -4,8 +4,9 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Taxon;
+use Illuminate\Support\Facades\Auth;
 
-class TaxonList extends Component
+class TaxonUm extends Component
 {
     // Agar komponen ini menjadi Full Page Component yang menggunakan Layout
     protected $layout = 'layouts.base'; // Layout minimal yang ada @vite nya

@@ -24,10 +24,11 @@ use App\Livewire\TaxonEr;
 */
 
 Route::view('/', 'welcome')->name('home');
+Route::redirect('/dashboard', '/taxon-um');
+Route::view('/taxon-um', 'dashboard');
+Route::get('/taxonomy', TaxonUm::class)->name('taxonomy.list');
 
-Route::get('/taxonomy', TaxonEr::class)->name('taxon-er');
 
-Route::get('/dashboard', 'Dashboard');
 
 Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)
@@ -35,6 +36,9 @@ Route::middleware('guest')->group(function () {
 
     Route::get('register', Register::class)
         ->name('register');
+        
+    Route::get('/dashboard', TaxonEr::class)
+        ->name('dashboard');
 });
 
 Route::get('password/reset', Email::class)
