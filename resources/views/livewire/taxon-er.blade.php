@@ -43,6 +43,10 @@
                         <option value="{{ $p->id }}">{{ $p->name }} ({{ $p->rank }})</option>
                     @endforeach
                 </select>
+                
+                @error('parent_id') 
+                    <span class="text-red-500 text-xs font-medium">{{ $message }}</span> 
+                @enderror
             </div>
 
             <div class="md:col-span-2 flex justify-end gap-3 pt-2">

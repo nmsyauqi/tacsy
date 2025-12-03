@@ -6,7 +6,7 @@ use Livewire\Component;
 use Livewire\Attributes\On; 
 use App\Models\Taxon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rule; // <-- Pastikan import ini ada
 
 class TaxonEr extends Component
 {
@@ -14,12 +14,11 @@ class TaxonEr extends Component
     public $rank;
     public $parent_id;
     
-    // Properti untuk melacak mode Edit
     public $editingTaxonId = null; 
 
+    // Urutan: 0 (Tertinggi) -> 6 (Terendah)
     public $ranks = ['Kingdom', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species'];
 
-    // Listener Edit
     #[On('edit-taxon')]
     public function edit($id)
     {
@@ -41,23 +40,41 @@ class TaxonEr extends Component
     public function save()
     {
         $this->validate([
+            // 1. Validasi Nama Unik
             'name' => [
                 'required', 
                 'min:3', 
                 'string',
-                // Aturan: Harus UNIK di tabel 'taxa' kolom 'name'
-                // ->ignore(...): Kecuali data itu sendiri (saat mode Edit)
                 Rule::unique('taxa', 'name')->ignore($this->editingTaxonId)
             ],
-            'rank' => 'required|string',
-            'parent_id' => 'nullable|exists:taxa,id',
+            
+            'rank' => 'required|string|in:' . implode(',', $this->ranks),
+            
+            // 2. Validasi Hierarki
+            'parent_id' => [
+                'nullable',
+                'exists:taxa,id',
+                function ($attribute, $value, $fail) {
+                    if ($value) {
+                        $parent = Taxon::find($value);
+                        
+                        $parentIdx = array_search($parent->rank, $this->ranks);
+                        $currentIdx = array_search($this->rank, $this->ranks);
+
+                        // Parent harus punya index lebih kecil (rank lebih tinggi)
+                        if ($parentIdx !== false && $currentIdx !== false) {
+                            if ($parentIdx >= $currentIdx) {
+                                $fail("Hierarki Salah: Induk ({$parent->rank}) tidak boleh lebih tinggi atau sama dengan data ini ({$this->rank}).");
+                            }
+                        }
+                    }
+                },
+            ],
         ], [
-            // Pesan Error Custom (Biar lebih jelas ke user)
             'name.unique' => 'Nama organisme ini sudah ada di database! Data ganda ditolak.',
         ]);
 
         if ($this->editingTaxonId) {
-            // Update
             $taxon = Taxon::find($this->editingTaxonId);
             $taxon->update([
                 'name' => $this->name,
@@ -66,7 +83,6 @@ class TaxonEr extends Component
             ]);
             $message = 'Data berhasil diperbarui!';
         } else {
-            // Create
             Taxon::create([
                 'name' => $this->name,
                 'rank' => $this->rank,
@@ -83,13 +99,12 @@ class TaxonEr extends Component
 
     public function render()
     {
-        // BAGIAN PENTING: Mendefinisikan variabel $potentialParents
         $potentialParents = Taxon::where('rank', '!=', 'Species')
             ->orderBy('name')
             ->get();
 
         return view('livewire.taxon-er', [
             'parents' => $potentialParents
-        ])->layout('layouts.taskbar'); // Menggunakan Layout Taskbar
+        ])->layout('layouts.taskbar');
     }
 }
