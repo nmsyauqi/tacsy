@@ -29,7 +29,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     
-    Route::get('/dashboard', TaxonEr::class)->name('dashboard');
+    Route::get('/taxon-er', TaxonEr::class)->name('dashboard');
     Route::get('/settings/profile', Profile::class)->name('profile.edit');
     Route::get('/settings/password', Password::class)->name('user-password.edit');
     Route::get('/settings/appearance', Appearance::class)->name('appearance.edit');

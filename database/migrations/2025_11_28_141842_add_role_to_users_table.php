@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            // Tambahkan kolom role dengan default 'writer'
+            $table->string('role')->default('writer')->after('email'); 
         });
     }
 
@@ -22,7 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            // Hapus kolom jika rollback
+            $table->dropColumn('role');
         });
     }
 };
