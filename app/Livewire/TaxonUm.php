@@ -3,30 +3,34 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\Attributes\On; // Import Attribute On
 use App\Models\Taxon;
-use Illuminate\Support\Facades\Auth;
 
 class TaxonUm extends Component
 {
-    // Agar komponen ini menjadi Full Page Component yang menggunakan Layout
-    protected $layout = 'layouts.base'; // Layout minimal yang ada @vite nya
+    // Hapus properti $layout jika komponen ini akan di-embed di dalam TaxonEr.
+    // Atau biarkan default, Laravel cukup pintar mendeteksi context-nya.
 
-    public $taxons; // Keranjang data
-    
-    public function mount()
+    public $search = '';
+
+    // Listener: Jika ada event 'taxon-updated', jalankan render ulang
+    #[On('taxon-updated')] 
+    public function refreshList()
     {
-        $this->loadData();
+        // Kosong saja, Livewire otomatis me-render ulang komponen
     }
 
-    public function loadData()
-    {
-        // Ambil SEMUA data Takson, urutkan berdasarkan rank
-        $this->taxons = Taxon::with('parent')->orderBy('rank')->get();
-    }
-
-    // Hanya fungsi render yang tersisa (READ)
     public function render()
     {
-        return view('livewire.taxon-um');
+        // Logic Filter sederhana
+        $taxons = Taxon::query()
+            ->when($this->search, fn($q) => $q->where('name', 'like', '%'.$this->search.'%'))
+            ->with('parent')
+            ->orderBy('rank')
+            ->get();
+
+        return view('livewire.taxon-um', [
+            'taxons' => $taxons
+        ]);
     }
 }

@@ -12,34 +12,22 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\TaxonUm;
 use App\Livewire\TaxonEr;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
 
 Route::view('/', 'welcome')->name('home');
-Route::redirect('/dashboard', '/taxon-um');
-Route::view('/taxon-um', 'dashboard');
-Route::get('/taxonomy', TaxonUm::class)->name('taxonomy.list');
-
-
 
 Route::middleware('guest')->group(function () {
-    Route::get('login', Login::class)
-        ->name('login');
+    Route::get('login', Login::class)->name('login');
+    Route::get('register', Register::class)->name('register');
+    Route::get('/taxon-um', TaxonUm::class)->name('taxon-um');
 
-    Route::get('register', Register::class)
-        ->name('register');
-        
-    Route::get('/dashboard', TaxonEr::class)
-        ->name('dashboard');
 });
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    
+    Route::get('/dashboard', TaxonEr::class)->name('dashboard');
+
+});
+
 
 Route::get('password/reset', Email::class)
     ->name('password.request');
