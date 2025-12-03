@@ -1,0 +1,8 @@
+Hostname:
+localhost
+Database:
+nmsyauqi_tacsy
+Username:
+nmsyauqi_tacsy
+Password:
+9kFpeWe6TzbDgn2DL65D
