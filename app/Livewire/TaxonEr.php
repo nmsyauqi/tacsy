@@ -13,12 +13,12 @@ class TaxonEr extends Component
     public $rank;
     public $parent_id;
     
-    // Properti baru untuk melacak mode Edit
+    // Properti untuk melacak mode Edit
     public $editingTaxonId = null; 
 
     public $ranks = ['Kingdom', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species'];
 
-    // LISTENER: Menangkap sinyal saat tombol Edit di bawah diklik
+    // Listener Edit
     #[On('edit-taxon')]
     public function edit($id)
     {
@@ -32,7 +32,6 @@ class TaxonEr extends Component
         }
     }
 
-    // Fungsi untuk batal edit dan kembali ke mode tambah
     public function cancelEdit()
     {
         $this->reset(['name', 'rank', 'parent_id', 'editingTaxonId']);
@@ -47,7 +46,7 @@ class TaxonEr extends Component
         ]);
 
         if ($this->editingTaxonId) {
-            // --- LOGIKA UPDATE ---
+            // Update
             $taxon = Taxon::find($this->editingTaxonId);
             $taxon->update([
                 'name' => $this->name,
@@ -56,7 +55,7 @@ class TaxonEr extends Component
             ]);
             $message = 'Data berhasil diperbarui!';
         } else {
-            // --- LOGIKA CREATE ---
+            // Create
             Taxon::create([
                 'name' => $this->name,
                 'rank' => $this->rank,
@@ -66,21 +65,20 @@ class TaxonEr extends Component
             $message = 'Data berhasil ditambahkan!';
         }
 
-        // Reset form ke mode awal
         $this->cancelEdit();
-        
-        // Refresh list di bawah
         $this->dispatch('taxon-updated'); 
-        
         session()->flash('status', $message);
     }
 
     public function render()
     {
-        $potentialParents = Taxon::where('rank', '!=', 'Species')->orderBy('name')->get();
+        // BAGIAN PENTING: Mendefinisikan variabel $potentialParents
+        $potentialParents = Taxon::where('rank', '!=', 'Species')
+            ->orderBy('name')
+            ->get();
 
         return view('livewire.taxon-er', [
             'parents' => $potentialParents
-        ]);
+        ])->layout('layouts.taskbar'); // Menggunakan Layout Taskbar
     }
 }

@@ -30,6 +30,6 @@ class TaxonUm extends Component
         return view('livewire.taxon-um', [
             'groupedTaxons' => $groupedTaxons,
             'rankOrder' => $rankOrder
-        ])->layout('layouts.base');
+        ])->layout('layouts.taskbar');
     }
 }

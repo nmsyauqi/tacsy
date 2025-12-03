@@ -25,7 +25,7 @@
             <flux:navlist variant="outline">
                 <flux:navlist.group heading="Pustaka Taksonomi">
                     
-                    <flux:navlist.item icon="layout-grid" :href="route('taxonomy.list')" :current="request()->routeIs('taxonomy.list')" wire:navigate>
+                    <flux:navlist.item icon="layout-grid" :href="route('taxon-um')" :current="request()->routeIs('taxonomy.list')" wire:navigate>
                         Taxonum (Pustaka)
                     </flux:navlist.item>
 
