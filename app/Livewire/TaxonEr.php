@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\Attributes\On; 
 use App\Models\Taxon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class TaxonEr extends Component
 {
@@ -40,9 +41,19 @@ class TaxonEr extends Component
     public function save()
     {
         $this->validate([
-            'name' => 'required|min:3|string',
+            'name' => [
+                'required', 
+                'min:3', 
+                'string',
+                // Aturan: Harus UNIK di tabel 'taxa' kolom 'name'
+                // ->ignore(...): Kecuali data itu sendiri (saat mode Edit)
+                Rule::unique('taxa', 'name')->ignore($this->editingTaxonId)
+            ],
             'rank' => 'required|string',
             'parent_id' => 'nullable|exists:taxa,id',
+        ], [
+            // Pesan Error Custom (Biar lebih jelas ke user)
+            'name.unique' => 'Nama organisme ini sudah ada di database! Data ganda ditolak.',
         ]);
 
         if ($this->editingTaxonId) {

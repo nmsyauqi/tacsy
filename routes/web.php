@@ -18,6 +18,7 @@ use App\Livewire\Settings\TwoFactor;
 
 
 Route::view('/', 'welcome')->name('home');
+Route::redirect('/dashboard', '/taxon-er');
 Route::get('/taxon-um', TaxonUm::class)->name('taxon-um');
 
 Route::middleware('guest')->group(function () {
