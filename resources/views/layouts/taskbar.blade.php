@@ -27,14 +27,14 @@
                             <a href="{{ route('taxon-um') }}" 
                                class="transition hover:text-indigo-600 {{ request()->routeIs('taxon-um') ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-600 dark:text-zinc-400' }}"
                                wire:navigate>
-                                Pustaka (Public)
+                                Pustaka
                             </a>
 
                             @auth
                                 <a href="{{ route('dashboard') }}" 
                                    class="transition hover:text-indigo-600 {{ request()->routeIs('dashboard') ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-600 dark:text-zinc-400' }}"
                                    wire:navigate>
-                                    Admin (CRUD)
+                                    Admin
                                 </a>
                             @endauth
                         </nav>
