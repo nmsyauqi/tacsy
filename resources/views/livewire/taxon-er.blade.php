@@ -23,7 +23,9 @@
 
             <div class="space-y-2">
                 <label class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300">Peringkat (Rank)</label>
-                <select wire:model="rank" 
+                
+                {{-- PERUBAHAN DI SINI: Tambahkan .live --}}
+                <select wire:model.live="rank" 
                         class="w-full rounded-lg border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm">
                     <option value="">-- Pilih Tingkatan --</option>
                     @foreach($ranks as $r)

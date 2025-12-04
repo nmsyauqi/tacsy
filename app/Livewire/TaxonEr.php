@@ -102,22 +102,61 @@ class TaxonEr extends Component
         session()->flash('status', $message);
     }
 
+    public function getAllowedParentRanks()
+    {
+        // Jika Rank belum dipilih, jangan tampilkan apa-apa (atau tampilkan semua)
+        if (!$this->rank) return $this->ranks;
+
+        // Cari posisi index rank yang dipilih saat ini
+        $currentIndex = array_search($this->rank, $this->ranks);
+
+        // Ambil semua rank yang indexnya LEBIH KECIL (Lebih tinggi hierarkinya)
+        // Contoh: Pilih 'Family' (index 4), maka ambil index 0,1,2,3
+        return array_slice($this->ranks, 0, $currentIndex);
+    }
+
+    public function updatedRank()
+    {
+        // Reset pilihan parent karena daftar parent-nya pasti berubah
+        $this->reset('parent_id'); 
+    }
+
     public function render()
     {
-        $query = Taxon::where('rank', '!=', 'Species');
+        // 1. Tentukan Rank Induk yang Valid (HANYA SATU TINGKAT DI ATAS)
+        $allowedParentRank = null;
 
+        if ($this->rank) {
+            // Cari posisi index rank saat ini (Contoh: Genus = index 5)
+            $currentIndex = array_search($this->rank, $this->ranks);
+
+            // Bapaknya adalah index - 1 (Contoh: Family = index 4)
+            // Pastikan index tidak negatif (Kingdom tidak punya bapak)
+            if ($currentIndex !== false && $currentIndex > 0) {
+                $allowedParentRank = $this->ranks[$currentIndex - 1];
+            }
+        }
+
+        // 2. Buat Query
+        $query = Taxon::query();
+
+        if ($allowedParentRank) {
+            // Jika ada rank bapak yang valid, ambil data yang rank-nya ITU SAJA
+            $query->where('rank', $allowedParentRank);
+        } else {
+            // Jika tidak ada bapak (misal pilih Kingdom, atau belum pilih rank), 
+            // kosongkan list parent agar user tidak bingung
+            $query->whereNull('id'); // Trik agar hasil kosong
+        }
+
+        // 3. Filter Diri Sendiri (Mode Edit)
         if ($this->editingTaxonId) {
             $query->where('id', '!=', $this->editingTaxonId);
         }
 
-        $sortedParents = $query->get()->sortBy(function ($taxon) {
-            $rankIndex = array_search($taxon->rank, $this->ranks);
-            
-            return sprintf('%02d_%s', $rankIndex, $taxon->name);
-        });
-
+        // 4. Sortir & Render
         return view('livewire.taxon-er', [
-            'parents' => $sortedParents
+            'parents' => $query->orderBy('name')->get()
         ])->layout('layouts.taskbar');
     }
 }
