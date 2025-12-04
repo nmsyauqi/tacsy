@@ -104,13 +104,20 @@ class TaxonEr extends Component
 
     public function render()
     {
-        $query = Taxon::where('rank', '!=', 'Species')->orderBy('name');
+        $query = Taxon::where('rank', '!=', 'Species');
+
         if ($this->editingTaxonId) {
             $query->where('id', '!=', $this->editingTaxonId);
         }
 
+        $sortedParents = $query->get()->sortBy(function ($taxon) {
+            $rankIndex = array_search($taxon->rank, $this->ranks);
+            
+            return sprintf('%02d_%s', $rankIndex, $taxon->name);
+        });
+
         return view('livewire.taxon-er', [
-            'parents' => $query->get()
+            'parents' => $sortedParents
         ])->layout('layouts.taskbar');
     }
 }
